@@ -127,7 +127,7 @@ public class CrimeFragment extends Fragment {
             Toast.makeText(getActivity(), positionOfItem +" this is ", Toast.LENGTH_SHORT).show();
 
         }
-        Toast.makeText(getActivity(), "keti kur ", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "NOPE", Toast.LENGTH_SHORT).show();
 
     }
 
