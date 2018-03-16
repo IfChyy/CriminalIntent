@@ -2,7 +2,6 @@ package com.example.user.criminalintent;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,10 +17,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -37,8 +35,10 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     public static final String ARG_CRIME_ID = "crime_id";
     public static final String ITEM_ID = "item_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final int DIALOG_DATE1 = 25;
     private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_TIME = 1;
 
     private Crime crime;
     private EditText titleField;
@@ -96,15 +96,15 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         });
 
         //date button to pick the date of the crime
-        //using method updateDate to setText of the button
         dateButton = v.findViewById(R.id.crime_date);
-        updateDate();
         dateButton.setOnClickListener(this);
 
         //time button to pick the time of the crime
         timeButton = v.findViewById(R.id.crime_time);
-        timeButton.setText("ELLO");
         timeButton.setOnClickListener(this);
+        //using method updateDate to setText of the buttons
+        updateDate();
+        updateTime();
 
         //solved check box and ad a listener if checked which updates crime checked state
         solvedCheckBox = v.findViewById(R.id.crime_solved);
@@ -135,17 +135,23 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == dateButton.getId()) {
-            manager = getFragmentManager();
+           /* manager = getFragmentManager();
             DatePickerFragment dialog = DatePickerFragment.newInstance(crime.getDate());
             //requests information using parametar from previous fragment
             dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-            dialog.show(manager, DIALOG_DATE);
+            dialog.show(manager, DIALOG_DATE);*/
+
+            Intent in = DatePickerActivity.newIntent(getActivity(), crime.getDate());
+            // startActivity(in);
+            startActivityForResult(in, DIALOG_DATE1);
 
         }
 
-        if(view.getId() == timeButton.getId()){
+        if (view.getId() == timeButton.getId()) {
             manager = getFragmentManager();
-            TimePickerFragment dialog = new TimePickerFragment();
+            TimePickerFragment dialog = TimePickerFragment.newInstance(crime.getDate());
+            //requests information using parametar from previous fragment
+            dialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
             dialog.show(manager, DIALOG_TIME);
 
         }
@@ -155,23 +161,45 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != Activity.RESULT_OK){
+        if (resultCode != Activity.RESULT_OK) {
             return;
-        }
-        if(requestCode == REQUEST_DATE){
+        }//add or dialog date 1 for dialog beeing in activity fragment not a dialog itself
+        if (requestCode == REQUEST_DATE || requestCode == DIALOG_DATE1) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             crime.setDate(date);
             updateDate();
 
+
+        } else if (requestCode == REQUEST_TIME) {
+
+            Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            crime.getDate().setMinutes(time.getMinutes());
+            crime.getDate().setHours(time.getHours());
+            //time button
+            updateTime();
+
+
         }
     }
 
-    //method to update dateButton text
-    private void updateDate(){
+    //method to update dateButton text and time button text
+    private void updateDate() {
         //date button
         Calendar calendar = Calendar.getInstance();
-        String dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
-        String calendarDate = DateFormat.getDateInstance().format(crime.getDate());
-        dateButton.setText(dayLongName +",  " + calendarDate);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
+        Date date = crime.getDate();
+        dateButton.setText(simpleDateFormat.format(date));
+
     }
+
+    //method to update dateButton text and time button text
+    private void updateTime() {
+        //date button
+        String hours = String.valueOf(crime.getDate().getHours());
+        String minutes = String.valueOf(crime.getDate().getMinutes());
+        timeButton.setText(hours + ":" + minutes);
+
+    }
+
+
 }
