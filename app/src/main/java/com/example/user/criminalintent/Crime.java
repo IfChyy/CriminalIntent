@@ -55,4 +55,5 @@ public class Crime {
         this.solved = solved;
     }
 
+
 }

@@ -12,6 +12,8 @@ import java.util.UUID;
  * CrimeLab is a class holding all the crimes in one list (Recycler View)
  * after creation of a CrimeLab it creates a hundred crimes
  * and initilisez every second one solved true parameter
+ *
+ * added function to add crime
  */
 
 public class CrimeLab {
@@ -31,13 +33,14 @@ public class CrimeLab {
 
         crimes = new ArrayList<>();
 
-        for (int i = 0; i < 100; i++) {
+        //removed in chapter 13 where you add your own crimes
+  /*      for (int i = 0; i < 100; i++) {
             Crime crime = new Crime();
             crime.setTitle(("Crime #" + i));
             crime.setSolved(i % 2 == 0);
             crimes.add(crime);
+        }*/
 
-        }
     }
 
     //get all crimes list
@@ -55,5 +58,10 @@ public class CrimeLab {
             }
         }
         return null;
+    }
+
+    //add a crime to the list
+    public void addCrime(Crime c){
+        crimes.add(c);
     }
 }

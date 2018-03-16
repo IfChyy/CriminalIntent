@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ViewParent;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.UUID;
  * using left and right swipe to display different CrimeFragmetns
  */
 
-public class CrimePagerActicity extends FragmentActivity {
+public class CrimePagerActicity extends AppCompatActivity {
 
     public static final String EXTRA_CRIME_ID = "com.example.user.criminalintent.crime_id";
 

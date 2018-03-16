@@ -4,10 +4,14 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -27,6 +31,7 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     private static final int REQUEST_CRIME = 1;
+    private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
 
 
     private RecyclerView crimeRecyclerView;
@@ -35,6 +40,13 @@ public class CrimeListFragment extends Fragment {
 
     private String tempTitle;
     private int clickedItemPos;
+    private boolean subtitleVisible = true;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Nullable
     @Override
@@ -43,9 +55,53 @@ public class CrimeListFragment extends Fragment {
 
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         crimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //check if bundle saved, if not null set visibility state before returning to this fragment/rotating
+        if(savedInstanceState != null){
+            subtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        }
 
         UpdateUI();
         return view;
+    }
+
+    //override options menu to add + add button
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime_list, menu);
+        //if show subtitle cliecked recreate the options menu to store the title after rotating screen
+        MenuItem subtitleItem = menu.findItem(R.id.menu_item_show_subtitle);
+        if(subtitleVisible) {
+            subtitleItem.setTitle(R.string.hide_subtitel);
+        }else{
+            subtitleItem.setTitle(R.string.show_subtitle);
+        }
+    }
+
+    //get menu item selected
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_new_crime:
+                Crime crime = new Crime();
+                CrimeLab.get(getActivity()).addCrime(crime);
+                //show the fragment holding each crime
+                Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
+                startActivity(in);
+                //udapte the view with items in the list
+                updateSubtitle();
+                return true;
+                //toggle show subtitle clicked and change its boolean
+            case R.id.menu_item_show_subtitle:
+                subtitleVisible = !subtitleVisible;
+                //invalidate the options menu show or hide subtitle
+                getActivity().invalidateOptionsMenu();
+                //update the subtitle
+                updateSubtitle();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     //after getting back from each crime if clicked resume
@@ -53,6 +109,12 @@ public class CrimeListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         UpdateUI();
+    }
+    //save the instance to the bundle to know if sub visible after rotation
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, subtitleVisible);
     }
 
     //update each item when changed
@@ -68,8 +130,24 @@ public class CrimeListFragment extends Fragment {
             adapter.notifyItemChanged(clickedItemPos);
 
         }
-
+        updateSubtitle();
     }
+
+    //update subtitle to show number of items in crimes list
+    public void updateSubtitle(){
+        CrimeLab crimeLab = CrimeLab.get(getActivity());
+        int crimeCount = crimeLab.getCrimes().size();
+        String subtitle = getString(R.string.subtitle_format, String.valueOf(crimeCount));
+        //if not visible equal to null
+        if(!subtitleVisible){
+            subtitle = null;
+        }
+
+        //show a little title text(SUBTITLE) under the title in our title bar
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(subtitle);
+    }
+
 
     //get result extra from fragment frament list item
     @Override
@@ -122,12 +200,12 @@ public class CrimeListFragment extends Fragment {
            /* Intent in = CrimeActivity.newIntent(getActivity(), crime.getId());
             startActivityForResult(in, REQUEST_CRIME);
 */
-           //using viewPager to open each fragment
+            //using viewPager to open each fragment
             Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
             startActivity(in);
 
             clickedItemPos = getLayoutPosition();
-            Toast.makeText(getActivity(), "pos " + clickedItemPos , Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "pos " + clickedItemPos, Toast.LENGTH_SHORT).show();
 
         }
 
