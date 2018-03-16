@@ -26,13 +26,14 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     private static final int REQUEST_CRIME = 1;
-    private static final String REQUEST_POSITION = "item_position";
+
 
     private RecyclerView crimeRecyclerView;
     private CrimeAdapter adapter;
     public static List<Crime> crimes;
 
     private String tempTitle;
+    private int clickedItemPos;
 
     @Nullable
     @Override
@@ -63,7 +64,7 @@ public class CrimeListFragment extends Fragment {
             crimeRecyclerView.setAdapter(adapter);
         } else {
 
-            adapter.notifyItemChanged(7);
+            adapter.notifyItemChanged(clickedItemPos);
 
         }
 
@@ -115,9 +116,16 @@ public class CrimeListFragment extends Fragment {
         //if item click open new fragment
         @Override
         public void onClick(View view) {
-            Intent in = CrimeActivity.newIntent(getActivity(), crime.getId());
-            in.putExtra(REQUEST_POSITION, getLayoutPosition());
+            //old code from the challenges to get information back from the fragment to the parent
+           /* Intent in = CrimeActivity.newIntent(getActivity(), crime.getId());
             startActivityForResult(in, REQUEST_CRIME);
+*/
+           //using viewPager to open each fragment
+            Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
+            startActivity(in);
+
+            clickedItemPos = getLayoutPosition();
+            Toast.makeText(getActivity(), "pos " + clickedItemPos , Toast.LENGTH_SHORT).show();
 
         }
 

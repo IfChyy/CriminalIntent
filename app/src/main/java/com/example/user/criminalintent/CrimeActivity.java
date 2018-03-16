@@ -16,6 +16,8 @@ import java.util.UUID;
  * passes infromation for id from each individual list item clicked and then creating
  * the fragment and showing it for particular ID
  */
+//-----------------------REPLACED BY CrimePagerActivity
+    //-------------KEPT FOR REFERENCE
 
 public class CrimeActivity extends SingleFragmentActivity {
 

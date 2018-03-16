@@ -2,9 +2,11 @@ package com.example.user.criminalintent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -29,18 +32,21 @@ import java.util.UUID;
  * and a check box informing the crime specialist if the crime was solved or not
  */
 
-public class CrimeFragment extends Fragment {
+public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     public static final String ARG_CRIME_ID = "crime_id";
     public static final String ITEM_ID = "item_id";
-    private static final int REQUEST_CRIME = 1;
+    private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_TIME = "DialogTime";
+    private static final int REQUEST_DATE = 0;
 
     private Crime crime;
     private EditText titleField;
     private Button dateButton;
+    private Button timeButton;
     private CheckBox solvedCheckBox;
 
-    private int positionOfItem;
+    private FragmentManager manager;
 
     //called when new instance of crimefragment is needed to be creade
     public static CrimeFragment newInstance(UUID crimeID) {
@@ -89,14 +95,16 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        //date button
-        Calendar calendar = Calendar.getInstance();
-        String dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
-        String calendarDate = DateFormat.getDateInstance().format(crime.getDate());
-        //removed calendar date need to add
+        //date button to pick the date of the crime
+        //using method updateDate to setText of the button
         dateButton = v.findViewById(R.id.crime_date);
-        dateButton.setText(dayLongName + ",  " + calendarDate);
-        dateButton.setEnabled(false);
+        updateDate();
+        dateButton.setOnClickListener(this);
+
+        //time button to pick the time of the crime
+        timeButton = v.findViewById(R.id.crime_time);
+        timeButton.setText("ELLO");
+        timeButton.setOnClickListener(this);
 
         //solved check box and ad a listener if checked which updates crime checked state
         solvedCheckBox = v.findViewById(R.id.crime_solved);
@@ -112,27 +120,58 @@ public class CrimeFragment extends Fragment {
         return v;
 
     }
+
     //returns a result to parent fragment/activity after completion of this one
-    public void returnResult(){
-        getActivity().setResult(Activity.RESULT_OK,new Intent().putExtra(ITEM_ID, crime.getTitle()));
+    public void returnResult() {
+        getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ITEM_ID, crime.getTitle()));
     }
 
     //returns intent extra with key extra_answer_shown and value false
     public static String wasAnswerShown(Intent result) {
         return result.getStringExtra(ITEM_ID);
     }
-    //get result extra from fragment frament list item
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CRIME) {
 
-            positionOfItem = data.getIntExtra("item_position", 0);
-            Toast.makeText(getActivity(), positionOfItem +" this is ", Toast.LENGTH_SHORT).show();
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == dateButton.getId()) {
+            manager = getFragmentManager();
+            DatePickerFragment dialog = DatePickerFragment.newInstance(crime.getDate());
+            //requests information using parametar from previous fragment
+            dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+            dialog.show(manager, DIALOG_DATE);
 
         }
-        Toast.makeText(getActivity(), "NOPE", Toast.LENGTH_SHORT).show();
 
+        if(view.getId() == timeButton.getId()){
+            manager = getFragmentManager();
+            TimePickerFragment dialog = new TimePickerFragment();
+            dialog.show(manager, DIALOG_TIME);
+
+        }
     }
 
+    //get the resulted date from date picker dialog fragment in onactivity result method
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != Activity.RESULT_OK){
+            return;
+        }
+        if(requestCode == REQUEST_DATE){
+            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            crime.setDate(date);
+            updateDate();
+
+        }
+    }
+
+    //method to update dateButton text
+    private void updateDate(){
+        //date button
+        Calendar calendar = Calendar.getInstance();
+        String dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+        String calendarDate = DateFormat.getDateInstance().format(crime.getDate());
+        dateButton.setText(dayLongName +",  " + calendarDate);
+    }
 }
