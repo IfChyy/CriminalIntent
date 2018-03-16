@@ -7,9 +7,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 /**
- * abstract class Single Frament Acitivity to hold
- * each fragment displayed in the CrimeIntent app
- * inflated by crimeActivity
+ * Created by Ivo Georgiev(IfChyy)
+ * Singleton abstract class representing a fragment
+ * after calling create fragment of the given type eg; CrimeFragment, CrimeListFragment
+ *
+ * when invoked oncreate method is called creating fragment manager and
+ * setting the fragment container where our new fragment is going to be placed
+ * if fragment is null it is created if not the old one is displayed/
  */
 
 public abstract class SingleFragmentActivity extends FragmentActivity {

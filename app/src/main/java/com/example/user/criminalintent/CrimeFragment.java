@@ -23,7 +23,10 @@ import java.util.UUID;
 
 /**
  * Created by Ivo Georgiev(IfChyy)
- * crime fragment is a fragment allowing the user to set a crime in the crimeList
+ * Crime fragment shows infomration for each particular clicked crime
+ * At the top is the Title followed by crime titleField(name, person)
+ * after that are the details of the crime: Date ( a button alowing to specify date
+ * and a check box informing the crime specialist if the crime was solved or not
  */
 
 public class CrimeFragment extends Fragment {
@@ -109,7 +112,7 @@ public class CrimeFragment extends Fragment {
         return v;
 
     }
-
+    //returns a result to parent fragment/activity after completion of this one
     public void returnResult(){
         getActivity().setResult(Activity.RESULT_OK,new Intent().putExtra(ITEM_ID, crime.getTitle()));
     }

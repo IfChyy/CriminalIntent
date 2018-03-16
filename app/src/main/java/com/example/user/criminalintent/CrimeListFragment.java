@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by Ivo Georgiev(IfChyy)
  * Crime List Fragment
- * holding the recycler view of all crimes
+ * Displaying all crimes to the user with title, date and a check box indicating if solved or not
  */
 
 public class CrimeListFragment extends Fragment {
@@ -46,12 +46,14 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
+    //after getting back from each crime if clicked resume
     @Override
     public void onResume() {
         super.onResume();
         UpdateUI();
     }
 
+    //update each item when changed
     protected void UpdateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         crimes = crimeLab.getCrimes();
@@ -78,10 +80,9 @@ public class CrimeListFragment extends Fragment {
     }
 
 
-
-
     //------------------------------CRIME HOLDER SUBCLASS
-// view holder for the recycler view list items
+    //Crime holder is a class holding each crime item in the recycler view
+    //and setting its properties
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 
@@ -111,6 +112,7 @@ public class CrimeListFragment extends Fragment {
             solvedCheckBox.setClickable(false);
         }
 
+        //if item click open new fragment
         @Override
         public void onClick(View view) {
             Intent in = CrimeActivity.newIntent(getActivity(), crime.getId());
@@ -123,7 +125,7 @@ public class CrimeListFragment extends Fragment {
 
 
     //------------------------------CRIME ADAPTER SUB CLASS
-//crime adapter to get information for each list item of crime and display it
+    // crime adapter to get information for each list item of crime and populate the Recycler View
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> crimes;
 

@@ -9,13 +9,16 @@ import java.util.UUID;
 
 /**
  * Created by Ivo Georgiev(Ifchyy)
- * crimelab singleton class with crimes list to store the crimes
+ * CrimeLab is a class holding all the crimes in one list (Recycler View)
+ * after creation of a CrimeLab it creates a hundred crimes
+ * and initilisez every second one solved true parameter
  */
 
 public class CrimeLab {
     private static CrimeLab crimelab;
     private List<Crime> crimes;
 
+    //get the instance of Crimelab - if already initialized return crimelab else create new
     public static CrimeLab get(Context context) {
         if (crimelab == null) {
             crimelab = new CrimeLab(context);
@@ -23,7 +26,7 @@ public class CrimeLab {
         return crimelab;
     }
 
-    //create a private construcrtor with crime list
+    //create a construcrtor and populate crime list
     CrimeLab(Context context) {
 
         crimes = new ArrayList<>();
