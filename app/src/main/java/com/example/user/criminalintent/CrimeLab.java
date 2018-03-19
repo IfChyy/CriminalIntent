@@ -106,7 +106,7 @@ public class CrimeLab {
 
     public void deleteCrime(Crime c) {
         ContentValues values = getContentValues(c);
-        dataBase.delete(CrimeSQLliteTable.CrimeTable.NAME, Columns.UUID + " == " + c.getId(),null);
+        dataBase.delete(CrimeSQLliteTable.CrimeTable.NAME, Columns.UUID + " == \"" + c.getId() + "\"",null);
     }
 
     //add rows of ifnormation to the databse columns
