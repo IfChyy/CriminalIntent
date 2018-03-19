@@ -17,6 +17,7 @@ public class Crime {
     private String title;
     private Date date;
     private boolean solved;
+    public String suspectName;
 
     public Crime() {
         //generate unique identifier
@@ -24,9 +25,11 @@ public class Crime {
         this.date = new Date();
     }
 
+
     public Crime(UUID id){
         this.id = id;
         this.date = new Date();
+
     }
     //--------------------------GETTERS AND SETTERS
 
@@ -59,6 +62,14 @@ public class Crime {
 
     public void setSolved(boolean solved) {
         this.solved = solved;
+    }
+
+    public String getSuspectName() {
+        return suspectName;
+    }
+
+    public void setSuspectName(String suspectName) {
+        this.suspectName = suspectName;
     }
 
 

@@ -116,6 +116,7 @@ public class CrimeLab {
         values.put(Columns.TITLE, crime.getTitle());
         values.put(Columns.DATE, crime.getDate().getTime());
         values.put(Columns.SOLVED, crime.isSolved() ? 1 : 0);
+        values.put(Columns.SUSPECT, crime.getSuspectName());
 
         return values;
     }

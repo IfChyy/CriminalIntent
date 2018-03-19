@@ -17,6 +17,7 @@ public class CrimeSQLliteTable {
             public static final String DATE = "date";
             public static final String TIME = "time";
             public static final String SOLVED = "solved";
+            public static final String SUSPECT = "suspect";
         }
     }
 

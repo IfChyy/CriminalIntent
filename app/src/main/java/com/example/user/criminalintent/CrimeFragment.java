@@ -1,13 +1,21 @@
 package com.example.user.criminalintent;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +28,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,11 +46,11 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     public static final String ARG_CRIME_ID = "crime_id";
     public static final String ITEM_ID = "item_id";
-    private static final String DIALOG_DATE = "DialogDate";
     private static final int DIALOG_DATE1 = 25;
     private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
+    private static final int REQUEST_CONTACT = 2;
 
     private Crime crime;
     private EditText titleField;
@@ -51,6 +60,14 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     private FragmentManager manager;
     private UUID crimeId;
+
+
+    private Button reportButton;
+    private Button suspectButton;
+    final Intent pickContact = new Intent(Intent.ACTION_PICK,
+            ContactsContract.Contacts.CONTENT_URI);
+
+    private Button callButton;
 
     //called when new instance of crimefragment is needed to be creade
     public static CrimeFragment newInstance(UUID crimeID) {
@@ -124,6 +141,27 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        //report button to send report via mail or other ap
+        reportButton = v.findViewById(R.id.crime_report_button);
+        reportButton.setOnClickListener(this);
+
+        //suspect button to get a contanctg info from contacts app
+        suspectButton = v.findViewById(R.id.crime_suspect_button);
+        suspectButton.setOnClickListener(this);
+
+        if (crime.getSuspectName() != null) {
+            suspectButton.setText(crime.getSuspectName());
+        }
+
+
+        //check if user phone has contacts app? if not dissable suspect button
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (packageManager.resolveActivity(pickContact, packageManager.MATCH_DEFAULT_ONLY) == null) {
+            suspectButton.setEnabled(false);
+        }
+        //call button CHALLENGE to call the suspect
+        callButton = v.findViewById(R.id.call_button);
+        callButton.setOnClickListener(this);
 
         return v;
 
@@ -151,7 +189,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
                     }
                 }*/
-              CrimeLab.get(getActivity()).deleteCrime(crime);
+                CrimeLab.get(getActivity()).deleteCrime(crime);
+                getActivity().finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -192,6 +231,35 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             dialog.show(manager, DIALOG_TIME);
 
         }
+
+        //used for sending mail to someone for the crime report
+        if (view.getId() == reportButton.getId()) {
+        /*    Intent in = new Intent(Intent.ACTION_SEND);
+            in.setType("text/plain");
+            in.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+            in.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+            in = Intent.createChooser(in, getString(R.string.send_report));
+            startActivity(in);*/
+
+            //CHALLENGE used intentBuilder to build intent
+            ShareCompat.IntentBuilder intentBuilder = ShareCompat.IntentBuilder.from(getActivity())
+                    .setType("text/plain")
+                    .setSubject(getActivity().getString(R.string.crime_report_subject));
+            startActivity(intentBuilder.createChooserIntent());
+        }
+
+        //get a suspect name from contancts app adn return it into the button text
+        if (view.getId() == suspectButton.getId()) {
+
+            startActivityForResult(pickContact, REQUEST_CONTACT);
+
+        }
+
+        if(view.getId() == callButton.getId()){
+            Intent in = new Intent(Intent.ACTION_DIAL);
+            in.setData(Uri.parse("tel:" + callButton.getText()));
+            startActivity(in);
+        }
     }
 
     //get the resulted date from date picker dialog fragment in onactivity result method
@@ -206,7 +274,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             crime.setDate(date);
             updateDate();
 
-
+            //request the time from the fragment dialog and return it in the button
         } else if (requestCode == REQUEST_TIME) {
 
             Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
@@ -215,9 +283,76 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             //time button
             updateTime();
 
+            //request the name of the contact selected and return in on the button
+        } else if (requestCode == REQUEST_CONTACT && data != null) {
 
+            //request contanct name by the book
+
+           /* Uri contactUri = data.getData();
+            //specify which fields to get data for
+            String[] queryFeilds = new String[]{
+                    ContactsContract.Contacts.DISPLAY_NAME};
+
+            //perform the query to get the contanct
+            Cursor cursor = getActivity().getContentResolver().query(contactUri, queryFeilds, null, null, null);
+
+//            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            try {
+                if (cursor.getCount() == 0) {
+                    return;
+                }
+                //pull out the first column of the first row of data
+                //eg suspect name
+                cursor.moveToFirst();
+                String suspect = cursor.getString(0);
+                crime.setSuspectName(suspect);
+                suspectButton.setText(suspect);
+
+            } finally {
+                cursor.close();
+
+            }*/
+
+            //requesto contanct name and phone number by me
+            Uri contactData = data.getData();
+            Cursor cursor = getActivity().getContentResolver()
+                    .query(contactData, null, null, null, null);
+
+            //if cursor.moveToFrist()
+            if (cursor.moveToFirst()) {
+                //get the name of the contact and place it in the text of the suspect button
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                suspectButton.setText(name);
+                String suspect = cursor.getString(0);
+                crime.setSuspectName(suspect);
+
+                //resolve contanct data + display name
+                ContentResolver cr = getActivity().getContentResolver();
+                Cursor content_uri = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
+                        "DISPLAY_NAME = '" + name + "'", null, null);
+
+                // cursor has next get contact_id
+                if (content_uri.moveToFirst()) {
+                    String contactId =
+                            cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                    //query the phone by contanct id
+                    Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
+
+                    //if phone present save it in a string and display it in button
+                    if (phones.moveToFirst()) {
+                        String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        callButton.setText(number);
+                    }
+                    //finaly close the cursors
+                    cursor.close();
+                    content_uri.close();
+                    phones.close();
+                }
+            }
         }
     }
+
 
     @Override
     public void onPause() {
@@ -241,6 +376,34 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         String hours = String.valueOf(crime.getDate().getHours());
         String minutes = String.valueOf(crime.getDate().getMinutes());
         timeButton.setText(hours + ":" + minutes);
+
+    }
+
+
+    //get crime report method
+    @SuppressLint("StringFormatInvalid")
+    public String getCrimeReport() {
+        String solvedString = null;
+
+        if (crime.isSolved()) {
+            solvedString = getString(R.string.crime_report_solved);
+        } else {
+            solvedString = getString(R.string.crime_report_unsolved);
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM dd");
+        String dateString = simpleDateFormat.format(crime.getDate());
+
+        String suspect = crime.getSuspectName();
+        if (suspect == null) {
+            suspect = getString(R.string.crime_report_no_suspect);
+        } else {
+            suspect = getString(R.string.crime_report_suspect, suspect);
+        }
+
+        String report = getString(R.string.crime_report, crime.getTitle(), dateString, solvedString, suspect);
+
+        return report;
 
     }
 
