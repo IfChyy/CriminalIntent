@@ -143,14 +143,15 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_crime:
-                CrimeLab crimeLab = CrimeLab.get(getActivity());
+              /*  CrimeLab crimeLab = CrimeLab.get(getActivity());
                 for (int i = 0; i < crimeLab.getCrimes().size(); i++) {
                     if(crimeLab.getCrimes().get(i).getId().equals(crimeId)){
                         crimeLab.getCrimes().remove(i);
                         getActivity().finish();
 
                     }
-                }
+                }*/
+              CrimeLab.get(getActivity()).deleteCrime(crime);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -216,6 +217,12 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
 
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        CrimeLab.get(getActivity()).updateCrime(crime);
     }
 
     //method to update dateButton text and time button text

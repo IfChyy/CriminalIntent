@@ -145,8 +145,12 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
             adapter = new CrimeAdapter(crimes);
             crimeRecyclerView.setAdapter(adapter);
         } else {
-
+            //update the crimes list and set it to the adapter after creating a new crime and query the DB
+            adapter.setCrimes(crimes);
             adapter.notifyDataSetChanged();
+            //update only one item from the recyrcler view
+            //adapter.notifyItemChanged(clickedItemPos);
+
 
         }
         updateSubtitle();
@@ -280,6 +284,10 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
             View view = inflater.inflate(R.layout.crime_list_item, parent, false);
 
             return new CrimeHolder(view);
+        }
+
+        public void setCrimes(List<Crime> crimes){
+            this.crimes = crimes;
         }
 
 

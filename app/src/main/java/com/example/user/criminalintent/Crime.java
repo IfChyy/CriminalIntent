@@ -1,5 +1,7 @@
 package com.example.user.criminalintent;
 
+import android.content.ContentValues;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,6 +24,10 @@ public class Crime {
         this.date = new Date();
     }
 
+    public Crime(UUID id){
+        this.id = id;
+        this.date = new Date();
+    }
     //--------------------------GETTERS AND SETTERS
 
 
