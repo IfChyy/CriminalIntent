@@ -14,7 +14,7 @@ import java.util.UUID;
  * and a checkbox if issue solved or not
  * <p>
  * passes infromation for id from each individual list item clicked and then creating
- * the fragment and showing it for particular ID
+ * the fragment and showing it for particular ID.
  */
 //-----------------------REPLACED BY CrimePagerActivity
     //-------------KEPT FOR REFERENCE

@@ -9,6 +9,9 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -47,6 +50,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     private CheckBox solvedCheckBox;
 
     private FragmentManager manager;
+    private UUID crimeId;
 
     //called when new instance of crimefragment is needed to be creade
     public static CrimeFragment newInstance(UUID crimeID) {
@@ -58,12 +62,16 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         return fragment;
     }
 
+    //oncreate added to add the menu using setHasOptionsMenu
+    //and init crime with crime id gotten from serializable bundle
+    //return result method to return if fragment after closing returnrs reuslt to parent CHALLENGE
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         //instance of crime
 
-        UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         crime = CrimeLab.get(getActivity()).getCrime(crimeId);
         returnResult();
     }
@@ -119,6 +127,34 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
         return v;
 
+    }
+
+
+    //override options menu to add + add button
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime, menu);
+
+    }
+
+    //get menu item selected
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete_crime:
+                CrimeLab crimeLab = CrimeLab.get(getActivity());
+                for (int i = 0; i < crimeLab.getCrimes().size(); i++) {
+                    if(crimeLab.getCrimes().get(i).getId().equals(crimeId)){
+                        crimeLab.getCrimes().remove(i);
+                        getActivity().finish();
+
+                    }
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     //returns a result to parent fragment/activity after completion of this one

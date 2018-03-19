@@ -11,6 +11,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewParent;
 
 import java.util.List;
@@ -66,6 +69,8 @@ public class CrimePagerActicity extends AppCompatActivity {
             }
         }
     }
+
+
     //get the crime id for the item to display and open crimePagerActivity instead of CrimeActivity
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         Intent in = new Intent(packageContext, CrimePagerActicity.class);

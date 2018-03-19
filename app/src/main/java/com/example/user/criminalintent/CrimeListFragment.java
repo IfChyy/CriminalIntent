@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,9 +16,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ActionMenuView;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -28,7 +36,7 @@ import java.util.List;
  * Displaying all crimes to the user with title, date and a check box indicating if solved or not
  */
 
-public class CrimeListFragment extends Fragment {
+public class CrimeListFragment extends Fragment implements View.OnClickListener{
 
     private static final int REQUEST_CRIME = 1;
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
@@ -42,6 +50,10 @@ public class CrimeListFragment extends Fragment {
     private int clickedItemPos;
     private boolean subtitleVisible = true;
 
+    private TextView emptyRecycler;
+    private Button addCrime;
+
+    //oncreate added to add the menu using setHasOptionsMenu
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +67,13 @@ public class CrimeListFragment extends Fragment {
 
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         crimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        //textview showing no crimes detected and button to add a crime
+        emptyRecycler = view.findViewById(R.id.empty_recycler_text_view);
+        addCrime = view.findViewById(R.id.empty_recycler_add_button);
+        addCrime.setOnClickListener(this);
         //check if bundle saved, if not null set visibility state before returning to this fragment/rotating
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             subtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
         }
 
@@ -71,9 +88,10 @@ public class CrimeListFragment extends Fragment {
         inflater.inflate(R.menu.fragment_crime_list, menu);
         //if show subtitle cliecked recreate the options menu to store the title after rotating screen
         MenuItem subtitleItem = menu.findItem(R.id.menu_item_show_subtitle);
-        if(subtitleVisible) {
+        if (subtitleVisible) {
             subtitleItem.setTitle(R.string.hide_subtitel);
-        }else{
+
+        } else {
             subtitleItem.setTitle(R.string.show_subtitle);
         }
     }
@@ -91,7 +109,7 @@ public class CrimeListFragment extends Fragment {
                 //udapte the view with items in the list
                 updateSubtitle();
                 return true;
-                //toggle show subtitle clicked and change its boolean
+            //toggle show subtitle clicked and change its boolean
             case R.id.menu_item_show_subtitle:
                 subtitleVisible = !subtitleVisible;
                 //invalidate the options menu show or hide subtitle
@@ -110,6 +128,7 @@ public class CrimeListFragment extends Fragment {
         super.onResume();
         UpdateUI();
     }
+
     //save the instance to the bundle to know if sub visible after rotation
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -127,19 +146,31 @@ public class CrimeListFragment extends Fragment {
             crimeRecyclerView.setAdapter(adapter);
         } else {
 
-            adapter.notifyItemChanged(clickedItemPos);
+            adapter.notifyDataSetChanged();
 
         }
         updateSubtitle();
+
+        //CHALLENGE if recyrcler view is empty show text view and add button
+        if (CrimeLab.get(getActivity()).getCrimes().size() < 1) {
+            Toast.makeText(getActivity(), "NEMA", Toast.LENGTH_SHORT).show();
+            crimeRecyclerView.setVisibility(View.INVISIBLE);
+            emptyRecycler.setVisibility(View.VISIBLE);
+            addCrime.setVisibility(View.VISIBLE);
+        } else {
+            crimeRecyclerView.setVisibility(View.VISIBLE);
+            emptyRecycler.setVisibility(View.INVISIBLE);
+            addCrime.setVisibility(View.INVISIBLE);
+        }
     }
 
     //update subtitle to show number of items in crimes list
-    public void updateSubtitle(){
+    public void updateSubtitle() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         int crimeCount = crimeLab.getCrimes().size();
-        String subtitle = getString(R.string.subtitle_format, String.valueOf(crimeCount));
+        String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural, crimeCount, crimeCount);
         //if not visible equal to null
-        if(!subtitleVisible){
+        if (!subtitleVisible) {
             subtitle = null;
         }
 
@@ -156,6 +187,14 @@ public class CrimeListFragment extends Fragment {
 
             tempTitle = CrimeFragment.wasAnswerShown(data);
             Toast.makeText(getActivity(), tempTitle + "", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == addCrime.getId()){
+            ActionMenuItemView btn = getActivity().findViewById(R.id.menu_item_new_crime);
+            btn.performClick();
         }
     }
 
