@@ -27,6 +27,7 @@ public class CrimeCursorWrapper extends CursorWrapper {
         long date = getLong(getColumnIndex(Columns.DATE));
         int issolved = getInt(getColumnIndex(Columns.SOLVED));
         String suspect = getString(getColumnIndex(Columns.SUSPECT));
+        String suspect_number = getString(getColumnIndex(Columns.SUSPECT_NUMBER));
 
 
         Crime crime = new Crime(UUID.fromString(uuidString));
@@ -34,6 +35,7 @@ public class CrimeCursorWrapper extends CursorWrapper {
         crime.setDate(new Date(date));
         crime.setSolved(issolved != 0);
         crime.setSuspectName(suspect);
+        crime.setSuspectNumber(suspect_number);
 
         return crime;
     }

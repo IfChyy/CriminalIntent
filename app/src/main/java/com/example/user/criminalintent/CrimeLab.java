@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 import com.example.user.criminalintent.database.CrimeBaseHelper;
@@ -12,6 +13,7 @@ import com.example.user.criminalintent.database.CrimeCursorWrapper;
 import com.example.user.criminalintent.database.CrimeSQLliteTable;
 import com.example.user.criminalintent.database.CrimeSQLliteTable.CrimeTable.Columns;
 
+import java.io.File;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +119,7 @@ public class CrimeLab {
         values.put(Columns.DATE, crime.getDate().getTime());
         values.put(Columns.SOLVED, crime.isSolved() ? 1 : 0);
         values.put(Columns.SUSPECT, crime.getSuspectName());
+        values.put(Columns.SUSPECT_NUMBER, crime.getSuspectNumber());
 
         return values;
     }
@@ -160,5 +163,15 @@ public class CrimeLab {
             cursor.close();
         }
         return crimes;
+    }
+
+    //add a photo and sav eit to external directory on the phone
+    public File getPhotoFile(Crime crime){
+        File externalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        if(externalFilesDir == null){
+            return null;
+        }
+        return new File(externalFilesDir, crime.getPhotoFilename());
     }
 }

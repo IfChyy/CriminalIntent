@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,8 +27,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -51,6 +55,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
+    //create a extra to store the location of the photo
+    private static final int REQUEST_PHOTO = 3;
 
     private Crime crime;
     private EditText titleField;
@@ -64,10 +70,17 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     private Button reportButton;
     private Button suspectButton;
+    //intent to pick a contact
     final Intent pickContact = new Intent(Intent.ACTION_PICK,
             ContactsContract.Contacts.CONTENT_URI);
 
     private Button callButton;
+    private ImageButton photoButton;
+    private ImageView photoView;
+
+    private File photoFile;
+    //intent to open the camera
+    final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
     //called when new instance of crimefragment is needed to be creade
     public static CrimeFragment newInstance(UUID crimeID) {
@@ -90,6 +103,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
         crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         crime = CrimeLab.get(getActivity()).getCrime(crimeId);
+        //init the photo of thecrime
+        photoFile = CrimeLab.get(getActivity()).getPhotoFile(crime);
         returnResult();
     }
 
@@ -162,6 +177,28 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         //call button CHALLENGE to call the suspect
         callButton = v.findViewById(R.id.call_button);
         callButton.setOnClickListener(this);
+
+        //photo button to take a photo of the crime
+        photoButton = v.findViewById(R.id.crime_camera);
+        photoButton.setOnClickListener(this);
+        //image view to display the image
+        photoView = v.findViewById(R.id.crime_photo);
+
+
+        //check if there is camera app on the device and therefore enable or disable camera button
+        boolean canTakePhoto = photoFile != null && captureImage.resolveActivity(packageManager) != null;
+        photoButton.setEnabled(canTakePhoto);
+
+        //if there is camera app
+        //get the uri of the photo file after image saved
+        //put extra for the output of the photo file
+        if(canTakePhoto){
+            Uri uri = Uri.fromFile(photoFile);
+            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        }
+
+
+
 
         return v;
 
@@ -260,6 +297,10 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             in.setData(Uri.parse("tel:" + callButton.getText()));
             startActivity(in);
         }
+
+        if(view.getId() == photoButton.getId()){
+            startActivityForResult(captureImage, REQUEST_PHOTO);
+        }
     }
 
     //get the resulted date from date picker dialog fragment in onactivity result method
@@ -343,6 +384,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
                     if (phones.moveToFirst()) {
                         String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         callButton.setText(number);
+                        crime.setSuspectNumber(number);
                     }
                     //finaly close the cursors
                     cursor.close();
