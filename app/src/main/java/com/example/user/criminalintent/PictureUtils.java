@@ -52,4 +52,6 @@ public class PictureUtils {
 
         return getScaleBitmap(path, size.x, size.y);
     }
+
+
 }

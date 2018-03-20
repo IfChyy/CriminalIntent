@@ -2,11 +2,13 @@ package com.example.user.criminalintent;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -33,6 +35,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -185,6 +188,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         photoButton.setOnClickListener(this);
         //image view to display the image
         photoView = v.findViewById(R.id.crime_photo);
+        photoView.setOnClickListener(this);
 
 
         //check if there is camera app on the device and therefore enable or disable camera button
@@ -194,7 +198,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         //if there is camera app
         //get the uri of the photo file after image saved
         //put extra for the output of the photo file
-        if(canTakePhoto){
+        if (canTakePhoto) {
             Uri uri = Uri.fromFile(photoFile);
             captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         }
@@ -294,17 +298,27 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
         }
 
-        if(view.getId() == callButton.getId()){
+        if (view.getId() == callButton.getId()) {
             Intent in = new Intent(Intent.ACTION_DIAL);
             in.setData(Uri.parse("tel:" + callButton.getText()));
             startActivity(in);
         }
 
-        if(view.getId() == photoButton.getId()){
+        if (view.getId() == photoButton.getId()) {
             //used to bypass camera app to build intent
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
             startActivityForResult(captureImage, REQUEST_PHOTO);
+        }
+
+        if (view.getId() == photoView.getId()) {
+            manager = getFragmentManager();
+
+            PicturePopupDialog popupDialog = PicturePopupDialog.newInstance(crimeId);
+            popupDialog.show(manager, null);
+
+           /* ;
+            picturePopUp.setPhotoViw(bitmap);*/
 
         }
     }
@@ -398,7 +412,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
                     phones.close();
                 }
             }
-        } else if(requestCode == REQUEST_PHOTO){
+        } else if (requestCode == REQUEST_PHOTO) {
             updatePhotoView();
         }
     }
@@ -458,12 +472,14 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     }
 
     //update the photoview after getting right dimensions
-    public void updatePhotoView(){
-        if(photoView == null || !photoFile.exists()){
-            photoView.setImageDrawable(null);
-        }else{
+    public void updatePhotoView() {
+        if (photoView == null || !photoFile.exists()) {
+            photoView.setEnabled(false);
+        } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), getActivity());
             photoView.setImageBitmap(bitmap);
+            photoView.setRotation(90);
+            photoView.setEnabled(true);
         }
     }
 
