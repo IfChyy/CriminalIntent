@@ -12,7 +12,12 @@ import java.util.UUID;
 
 /**
  * Created by Ivo Georgiev(IfCHyy)
- * used for getting the data from the database for each particular column
+ *
+ * CrimeCursorWrapper class uses cursor the get the information from the database to our fields
+ *
+ * with getCrime method we easily get all our information from the database
+ * and create a new Crime object with that particuluar data
+ * which we return to the appropriete caller of the method
  */
 
 public class CrimeCursorWrapper extends CursorWrapper {

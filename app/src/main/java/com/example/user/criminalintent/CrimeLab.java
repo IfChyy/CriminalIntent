@@ -79,7 +79,7 @@ public class CrimeLab {
             }
         }*/
 
-        //search for the crime in DB by id using cursor and forming a query
+        //search for the crime in DB by id using cursor and forming a query getting crimes by crimeID
         CrimeCursorWrapper cursor = queryCrimes(Columns.UUID + " = ?",
                 new String[]{id.toString()});
 
@@ -102,17 +102,16 @@ public class CrimeLab {
     public void addCrime(Crime c) {
         //  crimes.add(c);
 
-        //add crime in the database
+        //get the values for the Crime and insert it in the dataBase
         ContentValues values = getContentValues(c);
         dataBase.insert(CrimeSQLliteTable.CrimeTable.NAME, null, values);
     }
-
+    //delete a crime with UUID = equal to crime id
     public void deleteCrime(Crime c) {
-        ContentValues values = getContentValues(c);
         dataBase.delete(CrimeSQLliteTable.CrimeTable.NAME, Columns.UUID + " == \"" + c.getId() + "\"",null);
     }
 
-    //add rows of ifnormation to the databse columns
+    //add rows of ifnormation  about a crime to the databse columns
     private static ContentValues getContentValues(Crime crime) {
         ContentValues values = new ContentValues();
         values.put(Columns.UUID, crime.getId().toString());
@@ -127,6 +126,7 @@ public class CrimeLab {
 
     //method to update the infromation in the database
     // use "?" for adding the new id and preventing sql injection atack
+    //to treat everything as a string
     public void updateCrime(Crime crime) {
         String uuidString = crime.getId().toString();
         ContentValues values = getContentValues(crime);
@@ -135,7 +135,7 @@ public class CrimeLab {
                 Columns.UUID + " = ?", new String[]{uuidString});
     }
 
-    //doa query in the database to get tha values
+    //do a query in the database to get tha values
     private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
         Cursor cursor = dataBase.query(
                 CrimeSQLliteTable.CrimeTable.NAME,
@@ -149,7 +149,7 @@ public class CrimeLab {
         return new CrimeCursorWrapper(cursor);
     }
 
-    //get all crimes from DB
+    //get all crimes from DB using where clause null (*) equal to SELECT *
     public List<Crime> getCrimes() {
         List<Crime> crimes = new ArrayList<>();
         CrimeCursorWrapper cursor = queryCrimes(null, null);
@@ -166,15 +166,16 @@ public class CrimeLab {
         return crimes;
     }
 
-    //add a photo and sav eit to external directory on the phone
+    //add a photo and saev it to external directory on the phone
     public File getPhotoFile(Crime crime, Activity activity) {
-        String state = Environment.getExternalStorageState();
+        //get the external files directitry of the app
        File externalFilesDir = activity
              .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
+        //if null return null
         if(externalFilesDir == null){
             return null;
         }
+        //else add the photo to the dir
         return new File(externalFilesDir, crime.getPhotoFilename());
     }
 }

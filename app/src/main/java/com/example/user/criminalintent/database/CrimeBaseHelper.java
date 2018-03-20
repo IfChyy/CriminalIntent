@@ -11,7 +11,12 @@ import com.example.user.criminalintent.database.CrimeSQLliteTable.CrimeTable.Col
 /**
  * Created by Ivo Georgiev (IfChyy)
  * <p>
- * CrimeBaseHelper is a DataBaseHelper method to create the database we need for crimeIntent
+ * CrimeBaseHelper class help differentiate SQLite verison, database name and fields
+ * from the class holding the database methods
+ *
+ * here we easily create the verison, database name,  and query the fields of the database we want to be returned
+ * in this situation we return all our fields
+ *
  */
 
 public class CrimeBaseHelper extends SQLiteOpenHelper {

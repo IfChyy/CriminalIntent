@@ -45,19 +45,19 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     private static final int REQUEST_CRIME = 1;
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
 
-
     private RecyclerView crimeRecyclerView;
     private CrimeAdapter adapter;
     public static List<Crime> crimes;
-
+    //show title item clicked position
     private String tempTitle;
     private int clickedItemPos;
+    //check if subtitle set visible or not
     private boolean subtitleVisible = true;
-
+    //if list of cirmes empty show info and add crime button
     private TextView emptyRecycler;
     private Button addCrime;
 
-    //var for giving information to the fragment wi want to atach to
+    //callback variable to get infromation for updating or creating a crime fragment into the container
     private Callbacks callbacks;
 
     //oncreate added to add the menu using setHasOptionsMenu
@@ -67,16 +67,19 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
         setHasOptionsMenu(true);
     }
 
+    /// on create view creates the crimeListFragment with recycler view and updates its elemnte by
+    //UpdateUI method
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
-
+        //recycler list view
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         crimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         //textview showing no crimes detected and button to add a crime
         emptyRecycler = view.findViewById(R.id.empty_recycler_text_view);
+        //add crime button if empty recycler
         addCrime = view.findViewById(R.id.empty_recycler_add_button);
         addCrime.setOnClickListener(this);
         //check if bundle saved, if not null set visibility state before returning to this fragment/rotating
@@ -107,6 +110,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //if new crime button selected
             case R.id.menu_item_new_crime:
                 Crime crime = new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
@@ -115,6 +119,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
                 startActivity(in);*/
 
                //with callbacks for different devices we call method to check how to display the fragment
+                //using callbacks to update the listfragment in tablet mode
                 UpdateUI();
                 callbacks.onCrimeSelected(crime);
                 //udapte the view with items in the list
@@ -133,7 +138,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    //after getting back from each crime if clicked resume
+    //after getting back from each crime if clicked resume update the list of crimes
     @Override
     public void onResume() {
         super.onResume();
@@ -149,10 +154,13 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
 
     //update each item when changed
     public void UpdateUI() {
+        //get all crimes from the list
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         crimes = crimeLab.getCrimes();
 
+        //check if adapter not existing
         if (adapter == null) {
+            //yes then create the adapter and set its list of crimes
             adapter = new CrimeAdapter(crimes);
             crimeRecyclerView.setAdapter(adapter);
         } else {
@@ -164,11 +172,12 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
 
 
         }
+        //update the subtitle text of list nubmers
         updateSubtitle();
 
         //CHALLENGE if recyrcler view is empty show text view and add button
         if (CrimeLab.get(getActivity()).getCrimes().size() < 1) {
-            Toast.makeText(getActivity(), "NEMA", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "EMPTY", Toast.LENGTH_SHORT).show();
             crimeRecyclerView.setVisibility(View.INVISIBLE);
             emptyRecycler.setVisibility(View.VISIBLE);
             addCrime.setVisibility(View.VISIBLE);
@@ -195,7 +204,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     }
 
 
-    //get result extra from fragment frament list item
+    //get result extra from fragment child to fragmnet parent CHALLENGE method
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CRIME) {
@@ -204,17 +213,17 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), tempTitle + "", Toast.LENGTH_SHORT).show();
         }
     }
-
+    //onclick method to add a new crime to the list of crmes
     @Override
     public void onClick(View view) {
         if(view.getId() == addCrime.getId()){
+            // if recycler view is empty and hsowing add button perform menu add item click on this button aswell
             ActionMenuItemView btn = getActivity().findViewById(R.id.menu_item_new_crime);
             btn.performClick();
         }
     }
 
     //----------------------------INTERFACE CALLBACKS
-
     /**
      * used to atach and detach fragments from activity and pass wich fragment to be atached
      * requred interface for hosting activityies
@@ -240,13 +249,13 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     //and setting its properties
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-
         private TextView titleTextView;
         private TextView dateTextView;
         private CheckBox solvedCheckBox;
 
         private Crime crime;
 
+        //init each crime in the list text, date and checkbox
         public CrimeHolder(View itemView) {
             super(itemView);
             //set click listener on the whole list item not a particular view
@@ -258,12 +267,16 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
 
         }
 
-        //binding views to information from list
+        //binding views to information from list of crimes
         public void bindCrime(Crime crimee) {
+            //get crime
             crime = crimee;
+            //set title text with crime title
             titleTextView.setText(crime.getTitle());
+            //set date in appropriete format
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
             dateTextView.setText(simpleDateFormat.format(crime.getDate()));
+            //set if solved or not
             solvedCheckBox.setChecked(crime.isSolved());
             solvedCheckBox.setClickable(false);
         }
@@ -281,8 +294,9 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
 
             //using callbacks inferface to inflate the appropriete layout depending on device/tablet
             callbacks.onCrimeSelected(crime);
-
+            //get the position of lcicked item to update recyrcler view's only 1 item instead of whole list
             clickedItemPos = getLayoutPosition();
+            //get the positon clicked for test
             Toast.makeText(getActivity(), "pos " + clickedItemPos, Toast.LENGTH_SHORT).show();
 
         }
@@ -294,7 +308,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     // crime adapter to get information for each list item of crime and populate the Recycler View
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> crimes;
-
+        //init the adapter with list of crimes
         public CrimeAdapter(List<Crime> crimes) {
             this.crimes = crimes;
         }
@@ -312,7 +326,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
             holder.bindCrime(crime);
         }
 
-        //uses support list item layout for each list item in the recycler view
+        //uses  list item layout for each list crime item in the recycler view
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -321,6 +335,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
             return new CrimeHolder(view);
         }
 
+        //set crimes for the adapter if data changed
         public void setCrimes(List<Crime> crimes){
             this.crimes = crimes;
         }

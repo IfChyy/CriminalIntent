@@ -2,7 +2,8 @@ package com.example.user.criminalintent.database;
 
 /**
  * Created by Ivo Georgiev(IfChyy)
- * Used for creating the table name and table colums for a safer java reference
+ * CrimeSQLiteTabel class is used for initial creation of the DB
+ * its name, and collum names
  */
 
 public class CrimeSQLliteTable {

@@ -50,7 +50,6 @@ public class Crime {
         this.title = title;
     }
 
-
     public Date getDate() {
         return date;
     }
@@ -82,8 +81,10 @@ public class Crime {
     public void setSuspectNumber(String suspectNumber) {
         this.suspectNumber = suspectNumber;
     }
+    //--------------------------GETTERS AND SETTERS
 
-
+    // get photoFileName returns the photo image we made saved in the device by the name of
+    // IMG and id of our crime uniqie identifier, ending with .jpg
     public String getPhotoFilename(){
         return "IMG_" + getId().toString() + ".jpg";
     }
