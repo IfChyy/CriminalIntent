@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -27,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -56,6 +58,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     public static final String ARG_CRIME_ID = "crime_id";
     public static final String ITEM_ID = "item_id";
     private static final int DIALOG_DATE1 = 25;
+    private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
@@ -86,6 +89,11 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     private File photoFile;
     //intent to open the camera
     final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+    //width and height gotten after viewtree observer listening for layout pass
+    private int photoViewWidth, photoViewHeight;
+    //callbacks for updating ui real time on tablets
+    private Callbacks callbacks;
 
     //called when new instance of crimefragment is needed to be creade
     public static CrimeFragment newInstance(UUID crimeID) {
@@ -132,6 +140,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 crime.setTitle(charSequence.toString());
+                updateCrime();
             }
 
             @Override
@@ -158,6 +167,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 crime.setSolved(isChecked);
+                updateCrime();
             }
         });
 
@@ -188,8 +198,30 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         photoButton.setOnClickListener(this);
         //image view to display the image
         photoView = v.findViewById(R.id.crime_photo);
+        ViewTreeObserver viewTreeObserver = photoView.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                photoViewWidth = photoView.getWidth();
+                photoViewHeight = photoView.getHeight();
+
+            }
+        });
         photoView.setOnClickListener(this);
 
+        //use runnable thread with hanlder to delay the loading of the image into the photoview
+        //used for performance issue with slow loading of fragment while waiting for
+        //view tree observer to load and pass the dimensions of the imageview we neeed
+        //this way we delay by 80 milliseconds the loading of the suspect image into the imageview
+        //the result is flawless loading of fragment and instant loading of image with no lag in the app
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updatePhotoView(photoViewWidth, photoViewHeight);
+            }
+        }, 80);
 
         //check if there is camera app on the device and therefore enable or disable camera button
         boolean canTakePhoto = photoFile != null && captureImage.resolveActivity(packageManager) != null;
@@ -204,7 +236,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         }
 
         //update hte photoview with the last photo taken
-        updatePhotoView();
+
 
         return v;
 
@@ -235,6 +267,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
                 CrimeLab.get(getActivity()).deleteCrime(crime);
                 getActivity().finish();
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -253,16 +286,19 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == dateButton.getId()) {
-           /* manager = getFragmentManager();
-            DatePickerFragment dialog = DatePickerFragment.newInstance(crime.getDate());
-            //requests information using parametar from previous fragment
-            dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-            dialog.show(manager, DIALOG_DATE);*/
 
-            Intent in = DatePickerActivity.newIntent(getActivity(), crime.getDate());
-            // startActivity(in);
-            startActivityForResult(in, DIALOG_DATE1);
+        if (view.getId() == dateButton.getId()) {
+            if (getActivity().findViewById(R.id.detail_fragment_container) != null) {
+
+                manager = getFragmentManager();
+                DatePickerFragment dialog = DatePickerFragment.newInstance(crime.getDate());
+                //requests information using parametar from previous fragment
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                dialog.show(manager, DIALOG_DATE);
+            } else {
+                Intent in = DatePickerActivity.newIntent(getActivity(), crime.getDate());
+                startActivityForResult(in, DIALOG_DATE1);
+            }
 
         }
 
@@ -309,6 +345,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
             startActivityForResult(captureImage, REQUEST_PHOTO);
+
         }
 
         if (view.getId() == photoView.getId()) {
@@ -333,7 +370,10 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         if (requestCode == REQUEST_DATE || requestCode == DIALOG_DATE1) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             crime.setDate(date);
+            updateCrime();
             updateDate();
+            Toast.makeText(getActivity(), date+"", Toast.LENGTH_SHORT).show();
+           // dateButton.setText("KETI");
 
             //request the time from the fragment dialog and return it in the button
         } else if (requestCode == REQUEST_TIME) {
@@ -343,6 +383,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             crime.getDate().setHours(time.getHours());
             //time button
             updateTime();
+            updateCrime();
 
             //request the name of the contact selected and return in on the button
         } else if (requestCode == REQUEST_CONTACT && data != null) {
@@ -405,6 +446,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
                         String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         callButton.setText(number);
                         crime.setSuspectNumber(number);
+                        updateCrime();
                     }
                     //finaly close the cursors
                     cursor.close();
@@ -413,7 +455,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
                 }
             }
         } else if (requestCode == REQUEST_PHOTO) {
-            updatePhotoView();
+            updateCrime();
+            updatePhotoView(photoViewWidth, photoViewHeight);
         }
     }
 
@@ -427,7 +470,6 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     //method to update dateButton text and time button text
     private void updateDate() {
         //date button
-        Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
         Date date = crime.getDate();
         dateButton.setText(simpleDateFormat.format(date));
@@ -472,15 +514,40 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     }
 
     //update the photoview after getting right dimensions
-    public void updatePhotoView() {
+    public void updatePhotoView(int widht, int height) {
         if (photoView == null || !photoFile.exists()) {
             photoView.setEnabled(false);
         } else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), getActivity());
+            Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), widht, height);
             photoView.setImageBitmap(bitmap);
             photoView.setRotation(90);
             photoView.setEnabled(true);
         }
+    }
+
+
+    //------------------CALLBACKS INTERFACE
+
+    //uses crimeUpdate method to update hte list of crimes on tablest in real time
+    public interface Callbacks {
+        void onCrimeUpdate(Crime crme);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        callbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(crime);
+        callbacks.onCrimeUpdate(crime);
     }
 
 

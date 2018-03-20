@@ -1,12 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <DatePicker xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/dialog_date_date_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:calendarViewShown="false">
 
     </DatePicker>
@@ -15,7 +16,6 @@
         android:id="@+id/date_picker_ok_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center"
         android:text="@string/date_picker_button"/>
 

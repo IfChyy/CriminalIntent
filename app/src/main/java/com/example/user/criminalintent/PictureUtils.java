@@ -51,6 +51,13 @@ public class PictureUtils {
         activity.getWindowManager().getDefaultDisplay().getSize(size);
 
         return getScaleBitmap(path, size.x, size.y);
+
+
+    }
+    //CHALLENGE GET EFICIENT THUMBNAIL LOAD
+    public static Bitmap getScaledBitmap(String path,int width, int height){
+
+        return getScaleBitmap(path, width, height);
     }
 
 

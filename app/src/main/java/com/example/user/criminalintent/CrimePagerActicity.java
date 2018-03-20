@@ -26,7 +26,7 @@ import java.util.UUID;
  * using left and right swipe to display different CrimeFragmetns
  */
 
-public class CrimePagerActicity extends AppCompatActivity {
+public class CrimePagerActicity extends AppCompatActivity  implements CrimeFragment.Callbacks{
 
     public static final String EXTRA_CRIME_ID = "com.example.user.criminalintent.crime_id";
 
@@ -77,4 +77,11 @@ public class CrimePagerActicity extends AppCompatActivity {
         in.putExtra(EXTRA_CRIME_ID, crimeId);
         return in;
     }
+
+    @Override
+    public void onCrimeUpdate(Crime crme) {
+
+    }
+
+
 }

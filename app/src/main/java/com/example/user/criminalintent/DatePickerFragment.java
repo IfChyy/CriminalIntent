@@ -63,7 +63,7 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         return v;
     }
 
- /*   @Override
+   /* @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         //get the argumentad passed date and get values for year month and day
         Date date = (Date) getArguments().getSerializable(ARG_DATE);
@@ -79,7 +79,10 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         datePicker = v.findViewById(R.id.dialog_date_date_picker);
         datePicker.init(year, month, day, null);
 
-        return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.date_picker_title).setPositiveButton(android.R.string.ok, this).create();
+        okButton = v.findViewById(R.id.date_picker_ok_button);
+        okButton.setOnClickListener(this);
+
+        return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.date_picker_title).create();
     }*/
 
     //pass date argument from other fragmentsto this one with containing date element
@@ -107,7 +110,7 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
 
     }
 
-    public void setResult(int resultCode, Intent data){
+    public void setResult(int resultCode, Intent data) {
 
     }
 
@@ -120,10 +123,19 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         //sendResult(Activity.RESULT_OK, date);
         //getDialog().dismiss();
         //CHALENGE OPEN DATE PICKER DIALOG AS ACTIVITY
-        Intent in = new Intent();
-        in.putExtra(EXTRA_DATE, date);
-        getActivity().setResult(Activity.RESULT_OK, in);
-        getActivity().finish();
+
+
+        if (getActivity().findViewById(R.id.detail_fragment_container) != null) {
+            sendResult(Activity.RESULT_OK, date);
+            getDialog().dismiss();
+
+        } else {
+            Intent in = new Intent();
+            in.putExtra(EXTRA_DATE, date);
+            getActivity().setResult(Activity.RESULT_OK, in);
+
+            getActivity().finish();
+        }
 
 
     }

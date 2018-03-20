@@ -1,5 +1,7 @@
 package com.example.user.criminalintent;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -29,6 +31,8 @@ import org.w3c.dom.Text;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import javax.security.auth.callback.Callback;
+
 
 /**
  * Created by Ivo Georgiev(IfChyy)
@@ -52,6 +56,9 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
 
     private TextView emptyRecycler;
     private Button addCrime;
+
+    //var for giving information to the fragment wi want to atach to
+    private Callbacks callbacks;
 
     //oncreate added to add the menu using setHasOptionsMenu
     @Override
@@ -104,8 +111,12 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
                 Crime crime = new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
                 //show the fragment holding each crime
-                Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
-                startActivity(in);
+               /* Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
+                startActivity(in);*/
+
+               //with callbacks for different devices we call method to check how to display the fragment
+                UpdateUI();
+                callbacks.onCrimeSelected(crime);
                 //udapte the view with items in the list
                 updateSubtitle();
                 return true;
@@ -137,7 +148,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     }
 
     //update each item when changed
-    protected void UpdateUI() {
+    public void UpdateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         crimes = crimeLab.getCrimes();
 
@@ -202,6 +213,27 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+    //----------------------------INTERFACE CALLBACKS
+
+    /**
+     * used to atach and detach fragments from activity and pass wich fragment to be atached
+     * requred interface for hosting activityies
+     */
+    public interface Callbacks{
+        void onCrimeSelected(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        callbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
 
     //------------------------------CRIME HOLDER SUBCLASS
     //Crime holder is a class holding each crime item in the recycler view
@@ -244,8 +276,11 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
             startActivityForResult(in, REQUEST_CRIME);
 */
             //using viewPager to open each fragment
-            Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
-            startActivity(in);
+            /*Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
+            startActivity(in);*/
+
+            //using callbacks inferface to inflate the appropriete layout depending on device/tablet
+            callbacks.onCrimeSelected(crime);
 
             clickedItemPos = getLayoutPosition();
             Toast.makeText(getActivity(), "pos " + clickedItemPos, Toast.LENGTH_SHORT).show();
