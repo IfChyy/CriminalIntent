@@ -1,5 +1,6 @@
 package com.example.user.criminalintent;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -166,8 +167,10 @@ public class CrimeLab {
     }
 
     //add a photo and sav eit to external directory on the phone
-    public File getPhotoFile(Crime crime){
-        File externalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    public File getPhotoFile(Crime crime, Activity activity) {
+        String state = Environment.getExternalStorageState();
+       File externalFilesDir = activity
+             .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         if(externalFilesDir == null){
             return null;

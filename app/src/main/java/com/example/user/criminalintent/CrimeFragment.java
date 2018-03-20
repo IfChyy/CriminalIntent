@@ -6,8 +6,10 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -104,7 +106,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         crime = CrimeLab.get(getActivity()).getCrime(crimeId);
         //init the photo of thecrime
-        photoFile = CrimeLab.get(getActivity()).getPhotoFile(crime);
+        photoFile = CrimeLab.get(getActivity()).getPhotoFile(crime, getActivity());
         returnResult();
     }
 
@@ -197,8 +199,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         }
 
-
-
+        //update hte photoview with the last photo taken
+        updatePhotoView();
 
         return v;
 
@@ -299,7 +301,11 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         }
 
         if(view.getId() == photoButton.getId()){
+            //used to bypass camera app to build intent
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
             startActivityForResult(captureImage, REQUEST_PHOTO);
+
         }
     }
 
@@ -392,6 +398,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
                     phones.close();
                 }
             }
+        } else if(requestCode == REQUEST_PHOTO){
+            updatePhotoView();
         }
     }
 
@@ -447,6 +455,16 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
         return report;
 
+    }
+
+    //update the photoview after getting right dimensions
+    public void updatePhotoView(){
+        if(photoView == null || !photoFile.exists()){
+            photoView.setImageDrawable(null);
+        }else{
+            Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), getActivity());
+            photoView.setImageBitmap(bitmap);
+        }
     }
 
 
