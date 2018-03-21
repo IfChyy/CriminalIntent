@@ -96,17 +96,6 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
     //callbacks for calling methods to atach and detach fragments in tablet mode
     private Callbacks callbacks;
 
-    //called to instantiate a new fragment CrimeFragment with arguments for the crime id
-    //using bundle and returning results to previous fragment
-    public static CrimeFragment newInstance(UUID crimeID) {
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_CRIME_ID, crimeID);
-
-        CrimeFragment fragment = new CrimeFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     //oncreate added to add the menu using setHasOptionsMenu
     //and init crime with crime id gotten from serializable bundle
     //return result method to return if fragment after closing returnrs reuslt to parent CHALLENGE
@@ -125,7 +114,6 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         //CHALLENGE return a result from child to parent fragment
         returnResult();
     }
-
 
     //creates the view fragment of CRIMEFRAGMNET
     @Nullable
@@ -248,7 +236,6 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     }
 
-
     //method to create the options menu
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -279,17 +266,6 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    //CHALLENGE return a result from child fragment to parent fragment
-    //returns a result with crime title from child to parent
-    public void returnResult() {
-        getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ITEM_ID, crime.getTitle()));
-    }
-
-    //returns intent extra with key extra_answer_shown and value false
-    public static String wasAnswerShown(Intent result) {
-        return result.getStringExtra(ITEM_ID);
     }
 
     //onclick method to check which button was clicked and performa actions
@@ -494,25 +470,6 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         CrimeLab.get(getActivity()).updateCrime(crime);
     }
 
-    //method to update dateButton text in format specified
-    private void updateDate() {
-        //date button
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-        Date date = crime.getDate();
-        dateButton.setText(simpleDateFormat.format(date));
-
-    }
-
-    //method to update time button text
-    private void updateTime() {
-        //date button
-        String hours = String.valueOf(crime.getDate().getHours());
-        String minutes = String.valueOf(crime.getDate().getMinutes());
-        timeButton.setText(hours + ":" + minutes);
-
-    }
-
-
     //get crime report method to send the infromation to a user using mail
     @SuppressLint("StringFormatInvalid")
     public String getCrimeReport() {
@@ -538,6 +495,46 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
         return report;
 
+    }
+
+    //called to instantiate a new fragment CrimeFragment with arguments for the crime id
+    //using bundle and returning results to previous fragment
+    public static CrimeFragment newInstance(UUID crimeID) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeID);
+
+        CrimeFragment fragment = new CrimeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    //method to update dateButton text in format specified
+    private void updateDate() {
+        //date button
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
+        Date date = crime.getDate();
+        dateButton.setText(simpleDateFormat.format(date));
+
+    }
+
+    //method to update time button text
+    private void updateTime() {
+        //date button
+        String hours = String.valueOf(crime.getDate().getHours());
+        String minutes = String.valueOf(crime.getDate().getMinutes());
+        timeButton.setText(hours + ":" + minutes);
+
+    }
+
+    //CHALLENGE return a result from child fragment to parent fragment
+    //returns a result with crime title from child to parent
+    public void returnResult() {
+        getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ITEM_ID, crime.getTitle()));
+    }
+
+    //returns intent extra with key extra_answer_shown and value false
+    public static String wasAnswerShown(Intent result) {
+        return result.getStringExtra(ITEM_ID);
     }
 
     //update the photoview after getting right dimensions

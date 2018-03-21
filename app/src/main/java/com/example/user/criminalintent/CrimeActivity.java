@@ -23,20 +23,19 @@ public class CrimeActivity extends SingleFragmentActivity {
 
     public static final String EXTRA_CRIME_ID = "com.example.user.criminalintent.crime_id";
 
-
-    //creating an intent with extra to pass
-    public static Intent newIntent(Context packageContext, UUID crimeId) {
-        Intent in = new Intent(packageContext, CrimeActivity.class);
-        in.putExtra(EXTRA_CRIME_ID, crimeId);
-        return in;
-    }
-
     //init fragment
     @Override
     protected Fragment createFragment() {
 
         UUID crimeid = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
         return CrimeFragment.newInstance(crimeid);
+    }
+
+    //creating an intent with extra to pass
+    public static Intent newIntent(Context packageContext, UUID crimeId) {
+        Intent in = new Intent(packageContext, CrimeActivity.class);
+        in.putExtra(EXTRA_CRIME_ID, crimeId);
+        return in;
     }
 
 

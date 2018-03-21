@@ -57,12 +57,13 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         datePicker = v.findViewById(R.id.dialog_date_date_picker);
         datePicker.init(year, month, day, null);
 
+        //init ok button to pass the information back to the parent fragment
         okButton = v.findViewById(R.id.date_picker_ok_button);
         okButton.setOnClickListener(this);
 
         return v;
     }
-
+    //REMOVED AFTER CHALLENGE< KEPT FOR FUTURE REFERENCE
    /* @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         //get the argumentad passed date and get values for year month and day
@@ -85,6 +86,35 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.date_picker_title).create();
     }*/
 
+
+    //perform on click of ok button to send the date picked back to parent
+    @Override
+    public void onClick(View view) {
+        int year = datePicker.getYear();
+        int month = datePicker.getMonth();
+        int day = datePicker.getDayOfMonth();
+        Date date = new GregorianCalendar(year, month, day).getTime();
+        //sendResult(Activity.RESULT_OK, date);
+        //getDialog().dismiss();
+        //CHALENGE OPEN DATE PICKER DIALOG AS ACTIVITY
+
+        //if tablet mode of display date picker in activt/ else display in dialog
+        if (getActivity().findViewById(R.id.detail_fragment_container) != null) {
+            sendResult(Activity.RESULT_OK, date);
+            getDialog().dismiss();
+
+        } else {
+            Intent in = new Intent();
+            in.putExtra(EXTRA_DATE, date);
+            getActivity().setResult(Activity.RESULT_OK, in);
+
+            getActivity().finish();
+        }
+
+
+    }
+
+
     //pass date argument from other fragmentsto this one with containing date element
     public static DatePickerFragment newInstance(Date date) {
         Bundle args = new Bundle();
@@ -104,43 +134,11 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DATE, date);
 
-
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
-
-
-    }
-
-    public void setResult(int resultCode, Intent data) {
-
-    }
-
-    @Override
-    public void onClick(View view) {
-        int year = datePicker.getYear();
-        int month = datePicker.getMonth();
-        int day = datePicker.getDayOfMonth();
-        Date date = new GregorianCalendar(year, month, day).getTime();
-        //sendResult(Activity.RESULT_OK, date);
-        //getDialog().dismiss();
-        //CHALENGE OPEN DATE PICKER DIALOG AS ACTIVITY
-
-
-        if (getActivity().findViewById(R.id.detail_fragment_container) != null) {
-            sendResult(Activity.RESULT_OK, date);
-            getDialog().dismiss();
-
-        } else {
-            Intent in = new Intent();
-            in.putExtra(EXTRA_DATE, date);
-            getActivity().setResult(Activity.RESULT_OK, in);
-
-            getActivity().finish();
-        }
-
-
     }
 
 
+    //DISSABLED AFTER CHALLENGE KEPT FOR REFERENCE
 /*    //dialog interface click listener to send the date pack with resultCode ok
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {

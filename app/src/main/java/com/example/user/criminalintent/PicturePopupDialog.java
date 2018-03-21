@@ -26,7 +26,7 @@ import java.util.UUID;
 
 public class PicturePopupDialog extends DialogFragment {
 
-
+    //extra to get info from parent fragment
     private static final String ARG_PICTURE = "com.example.user.criminalintent.bitmap";
 
     private ImageView photoView;
@@ -34,15 +34,15 @@ public class PicturePopupDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
+        //create dialog builder and inflater
         LayoutInflater inflater = getActivity().getLayoutInflater() ;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
+        //get the layout
         View view = inflater.inflate(R.layout.picture_pop_up, null);
-
+        //init the image view for the image
         photoView = view.findViewById(R.id.picture_pop_up);
 
-
+        //update the image view with the photo from parent fragment
         updatePhotoView();
 
         return builder.setView(view).create();

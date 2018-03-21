@@ -40,7 +40,7 @@ import javax.security.auth.callback.Callback;
  * Displaying all crimes to the user with title, date and a check box indicating if solved or not
  */
 
-public class CrimeListFragment extends Fragment implements View.OnClickListener{
+public class CrimeListFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_CRIME = 1;
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
@@ -118,7 +118,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
                /* Intent in = CrimePagerActicity.newIntent(getActivity(), crime.getId());
                 startActivity(in);*/
 
-               //with callbacks for different devices we call method to check how to display the fragment
+                //with callbacks for different devices we call method to check how to display the fragment
                 //using callbacks to update the listfragment in tablet mode
                 UpdateUI();
                 callbacks.onCrimeSelected(crime);
@@ -138,11 +138,24 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    //after getting back from each crime if clicked resume update the list of crimes
+    //onclick method to add a new crime to the list of crmes
     @Override
-    public void onResume() {
-        super.onResume();
-        UpdateUI();
+    public void onClick(View view) {
+        if (view.getId() == addCrime.getId()) {
+            // if recycler view is empty and hsowing add button perform menu add item click on this button aswell
+            ActionMenuItemView btn = getActivity().findViewById(R.id.menu_item_new_crime);
+            btn.performClick();
+        }
+    }
+
+    //get result extra from fragment child to fragmnet parent CHALLENGE method
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CRIME) {
+
+            tempTitle = CrimeFragment.wasAnswerShown(data);
+            Toast.makeText(getActivity(), tempTitle + "", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //save the instance to the bundle to know if sub visible after rotation
@@ -150,6 +163,13 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_SUBTITLE_VISIBLE, subtitleVisible);
+    }
+
+    //after getting back from each crime if clicked resume update the list of crimes
+    @Override
+    public void onResume() {
+        super.onResume();
+        UpdateUI();
     }
 
     //update each item when changed
@@ -203,32 +223,14 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
         activity.getSupportActionBar().setSubtitle(subtitle);
     }
 
-
-    //get result extra from fragment child to fragmnet parent CHALLENGE method
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CRIME) {
-
-            tempTitle = CrimeFragment.wasAnswerShown(data);
-            Toast.makeText(getActivity(), tempTitle + "", Toast.LENGTH_SHORT).show();
-        }
-    }
-    //onclick method to add a new crime to the list of crmes
-    @Override
-    public void onClick(View view) {
-        if(view.getId() == addCrime.getId()){
-            // if recycler view is empty and hsowing add button perform menu add item click on this button aswell
-            ActionMenuItemView btn = getActivity().findViewById(R.id.menu_item_new_crime);
-            btn.performClick();
-        }
-    }
-
     //----------------------------INTERFACE CALLBACKS
+
     /**
-     * used to atach and detach fragments from activity and pass wich fragment to be atached
-     * requred interface for hosting activityies
+     * used to give fragmentList methods to atach and detach crimes and select which crime
+     * to apear.. depending on caller
+     * with this interface we delaget functionality back to activty which is hosting the fragments
      */
-    public interface Callbacks{
+    public interface Callbacks {
         void onCrimeSelected(Crime crime);
     }
 
@@ -308,6 +310,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
     // crime adapter to get information for each list item of crime and populate the Recycler View
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> crimes;
+
         //init the adapter with list of crimes
         public CrimeAdapter(List<Crime> crimes) {
             this.crimes = crimes;
@@ -336,7 +339,7 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener{
         }
 
         //set crimes for the adapter if data changed
-        public void setCrimes(List<Crime> crimes){
+        public void setCrimes(List<Crime> crimes) {
             this.crimes = crimes;
         }
 

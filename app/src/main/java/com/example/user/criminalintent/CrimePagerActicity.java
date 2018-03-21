@@ -70,6 +70,12 @@ public class CrimePagerActicity extends AppCompatActivity  implements CrimeFragm
         }
     }
 
+    //on update crime method to define functionality on which crime to update
+    @Override
+    public void onCrimeUpdate(Crime crme) {
+
+    }
+
 
     //get the crime id for the item to display and open crimePagerActivity instead of CrimeActivity
     public static Intent newIntent(Context packageContext, UUID crimeId) {
@@ -78,10 +84,7 @@ public class CrimePagerActicity extends AppCompatActivity  implements CrimeFragm
         return in;
     }
 
-    @Override
-    public void onCrimeUpdate(Crime crme) {
 
-    }
 
 
 }
