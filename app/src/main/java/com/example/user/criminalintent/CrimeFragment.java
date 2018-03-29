@@ -2,13 +2,11 @@ package com.example.user.criminalintent;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,12 +14,13 @@ import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.view.ViewCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,13 +34,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -342,6 +337,8 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         if (view.getId() == photoView.getId()) {
             manager = getFragmentManager();
 
+         //   startWithTransition(getActivity(),PicturePopupDialog.newInstance(crimeId),  photoView);
+
             PicturePopupDialog popupDialog = PicturePopupDialog.newInstance(crimeId);
             popupDialog.show(manager, null);
 
@@ -539,7 +536,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
 
     //update the photoview after getting right dimensions
     public void updatePhotoView(int widht, int height) {
-            //check if photoview is not null and file exist
+        //check if photoview is not null and file exist
         if (photoView == null || !photoFile.exists()) {
             //if not set photoview not clickable
             photoView.setEnabled(false);
@@ -566,6 +563,7 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         super.onAttach(activity);
         callbacks = (Callbacks) activity;
     }
+
     //used to detach fragment
     @Override
     public void onDetach() {
@@ -582,5 +580,15 @@ public class CrimeFragment extends Fragment implements View.OnClickListener {
         callbacks.onCrimeUpdate(crime);
     }
 
+
+    //CHAPTER 33 METHOD TO START THE IMAGEVIEW DIALOG WITH TRANSITIN
+
+    public static void startWithTransition(Activity activity, Intent intent, View sourceView) {
+        ViewCompat.setTransitionName(sourceView, "image_view_test_proba");
+        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(activity, sourceView, "image_view_test_proba");
+
+        activity.startActivity(intent, optionsCompat.toBundle());
+    }
 
 }
