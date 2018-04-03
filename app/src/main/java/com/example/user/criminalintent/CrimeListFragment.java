@@ -276,8 +276,8 @@ public class CrimeListFragment extends Fragment implements View.OnClickListener 
             //set title text with crime title
             titleTextView.setText(crime.getTitle());
             //set date in appropriete format
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
-            dateTextView.setText(simpleDateFormat.format(crime.getDate()));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
+                dateTextView.setText(simpleDateFormat.format(crime.getDate()));
             //set if solved or not
             solvedCheckBox.setChecked(crime.isSolved());
             solvedCheckBox.setClickable(false);

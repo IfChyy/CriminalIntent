@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
     private DatePicker datePicker;
     private Button okButton;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -56,6 +58,8 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         //initilise datepicked dialog
         datePicker = v.findViewById(R.id.dialog_date_date_picker);
         datePicker.init(year, month, day, null);
+
+
 
         //init ok button to pass the information back to the parent fragment
         okButton = v.findViewById(R.id.date_picker_ok_button);
