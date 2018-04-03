@@ -90,7 +90,6 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
         return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.date_picker_title).create();
     }*/
 
-
     //perform on click of ok button to send the date picked back to parent
     @Override
     public void onClick(View view) {
