@@ -14,6 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.user.criminalintent.dataclasses.Crime;
+import com.example.user.criminalintent.dataclasses.CrimeLab;
+import com.example.user.criminalintent.utilities.PictureUtils;
+
 import java.io.File;
 import java.util.UUID;
 

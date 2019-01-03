@@ -1,10 +1,9 @@
 package com.example.user.criminalintent.database;
 
 import android.database.Cursor;
-import android.database.CursorWindow;
 import android.database.CursorWrapper;
 
-import com.example.user.criminalintent.Crime;
+import com.example.user.criminalintent.dataclasses.Crime;
 import com.example.user.criminalintent.database.CrimeSQLliteTable.CrimeTable.Columns;
 
 import java.util.Date;

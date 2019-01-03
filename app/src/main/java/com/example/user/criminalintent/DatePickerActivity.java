@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 
+import com.example.user.criminalintent.utilities.SingleFragmentActivity;
+
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by Ivo Georgiev(IfChyy)

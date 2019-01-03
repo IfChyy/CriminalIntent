@@ -2,9 +2,10 @@ package com.example.user.criminalintent;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 
 import com.example.user.criminalintent.CrimeListFragment.Callbacks;
+import com.example.user.criminalintent.dataclasses.Crime;
+import com.example.user.criminalintent.utilities.SingleFragmentActivity;
 
 /**
  * Created by Ivo Georgiev(IfChyy)

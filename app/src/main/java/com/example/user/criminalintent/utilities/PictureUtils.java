@@ -1,4 +1,4 @@
-package com.example.user.criminalintent;
+package com.example.user.criminalintent.utilities;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

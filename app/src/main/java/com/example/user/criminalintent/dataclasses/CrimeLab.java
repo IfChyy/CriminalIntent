@@ -1,13 +1,11 @@
-package com.example.user.criminalintent;
+package com.example.user.criminalintent.dataclasses;
 
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
-import android.util.Log;
 
 import com.example.user.criminalintent.database.CrimeBaseHelper;
 import com.example.user.criminalintent.database.CrimeCursorWrapper;
@@ -15,7 +13,6 @@ import com.example.user.criminalintent.database.CrimeSQLliteTable;
 import com.example.user.criminalintent.database.CrimeSQLliteTable.CrimeTable.Columns;
 
 import java.io.File;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

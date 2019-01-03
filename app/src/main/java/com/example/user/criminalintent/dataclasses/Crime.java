@@ -1,4 +1,4 @@
-package com.example.user.criminalintent;
+package com.example.user.criminalintent.dataclasses;
 
 import android.content.ContentValues;
 

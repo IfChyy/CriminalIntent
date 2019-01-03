@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.user.criminalintent.Crime;
 import com.example.user.criminalintent.database.CrimeSQLliteTable.CrimeTable;
 import com.example.user.criminalintent.database.CrimeSQLliteTable.CrimeTable.Columns;
 
